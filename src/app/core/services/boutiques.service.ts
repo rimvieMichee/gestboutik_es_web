@@ -3,7 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PaginatedResult, PaginationQuery } from '../models/common.model';
-import { Boutique, BoutiqueStatus, CreateBoutiquePayload, UpdateBoutiquePayload } from '../models/boutique.model';
+import {
+  Boutique,
+  BoutiqueStatus,
+  BoutiqueWithAdmin,
+  CreateBoutiquePayload,
+  UpdateBoutiquePayload,
+} from '../models/boutique.model';
 import { toHttpParams } from './http-params.util';
 
 @Injectable({ providedIn: 'root' })
@@ -20,8 +26,8 @@ export class BoutiquesService {
     return this.http.get<Boutique>(`${this.baseUrl}/${id}`);
   }
 
-  create(payload: CreateBoutiquePayload): Observable<Boutique> {
-    return this.http.post<Boutique>(this.baseUrl, payload);
+  create(payload: CreateBoutiquePayload): Observable<BoutiqueWithAdmin> {
+    return this.http.post<BoutiqueWithAdmin>(this.baseUrl, payload);
   }
 
   update(id: string, payload: UpdateBoutiquePayload): Observable<Boutique> {

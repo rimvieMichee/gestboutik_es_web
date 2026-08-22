@@ -2,16 +2,6 @@
 
 <form class="card" style="max-width: 480px" [formGroup]="form" (ngSubmit)="submit()">
   <div class="form-field">
-    <label for="boutiqueId">Boutique *</label>
-    <select id="boutiqueId" formControlName="boutiqueId">
-      <option value="">— Sélectionner —</option>
-      @for (b of boutiques(); track b.id) {
-        <option [value]="b.id">{{ b.nom }}</option>
-      }
-    </select>
-  </div>
-
-  <div class="form-field">
     <label for="nom">Nom *</label>
     <input id="nom" type="text" formControlName="nom" />
   </div>

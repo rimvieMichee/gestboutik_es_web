@@ -1,6 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, computed } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+
+const SUPER_ADMIN_NAV = [{ path: '/boutiques', label: 'Boutiques' }];
+
+const ADMIN_NAV = [
+  { path: '/dashboard', label: 'Tableau de bord' },
+  { path: '/users', label: 'Employés' },
+  { path: '/products', label: 'Produits' },
+  { path: '/sales', label: 'Ventes' },
+];
 
 @Component({
   selector: 'app-layout',
@@ -10,13 +19,9 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrl: './layout.component.scss',
 })
 export class LayoutComponent {
-  readonly navLinks = [
-    { path: '/dashboard', label: 'Tableau de bord' },
-    { path: '/boutiques', label: 'Boutiques' },
-    { path: '/users', label: 'Employés' },
-    { path: '/products', label: 'Produits' },
-    { path: '/sales', label: 'Ventes' },
-  ];
+  readonly navLinks = computed(() =>
+    this.authService.currentUser()?.role === 'SUPER_ADMIN' ? SUPER_ADMIN_NAV : ADMIN_NAV,
+  );
 
   constructor(
     readonly authService: AuthService,

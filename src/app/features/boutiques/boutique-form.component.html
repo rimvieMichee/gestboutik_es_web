@@ -31,6 +31,33 @@
     <input id="ville" type="text" formControlName="ville" />
   </div>
 
+  @if (!isEdit()) {
+    <hr />
+    <p class="form-hint">
+      Compte administrateur de cette boutique : il pourra ensuite créer et gérer les comptes employés (accès mobile).
+    </p>
+
+    <div class="form-field">
+      <label for="adminPrenom">Prénom de l'admin *</label>
+      <input id="adminPrenom" type="text" formControlName="adminPrenom" />
+    </div>
+
+    <div class="form-field">
+      <label for="adminNom">Nom de l'admin *</label>
+      <input id="adminNom" type="text" formControlName="adminNom" />
+    </div>
+
+    <div class="form-field">
+      <label for="adminUsername">Identifiant de connexion *</label>
+      <input id="adminUsername" type="text" formControlName="adminUsername" />
+    </div>
+
+    <div class="form-field">
+      <label for="adminPassword">Mot de passe (min. 8 caractères) *</label>
+      <input id="adminPassword" type="password" formControlName="adminPassword" />
+    </div>
+  }
+
   @if (errorMessage()) {
     <p class="error-text">{{ errorMessage() }}</p>
   }

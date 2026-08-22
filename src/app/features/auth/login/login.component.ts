@@ -33,9 +33,9 @@ export class LoginComponent {
 
     const { username, password } = this.form.getRawValue();
     this.authService.login(username!, password!).subscribe({
-      next: () => {
+      next: (res) => {
         this.loading.set(false);
-        this.router.navigate(['/dashboard']);
+        this.router.navigate([res.user.role === 'SUPER_ADMIN' ? '/boutiques' : '/dashboard']);
       },
       error: (err: HttpErrorResponse) => {
         this.loading.set(false);

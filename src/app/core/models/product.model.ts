@@ -16,6 +16,7 @@ export interface Product {
   updatedAt: string;
 }
 
+// La boutique n'est jamais envoyée : c'est toujours celle de l'ADMIN connecté (déduite côté serveur).
 export interface CreateProductPayload {
   nom: string;
   description?: string;
@@ -25,7 +26,6 @@ export interface CreateProductPayload {
   seuilAlerte?: number;
   sku?: string;
   image?: string;
-  boutiqueId: string;
 }
 
-export type UpdateProductPayload = Partial<Omit<CreateProductPayload, 'boutiqueId' | 'quantiteDisponible'>>;
+export type UpdateProductPayload = Partial<Omit<CreateProductPayload, 'quantiteDisponible'>>;

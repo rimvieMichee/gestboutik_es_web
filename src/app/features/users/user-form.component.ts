@@ -3,9 +3,10 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../../core/services/users.service';
-import { BoutiquesService } from '../../core/services/boutiques.service';
-import { Boutique } from '../../core/models/boutique.model';
 
+// Cette page n'est accessible qu'à l'ADMIN d'une boutique (voir roleGuard) :
+// elle crée/modifie toujours un EMPLOYEE de SA boutique — jamais de sélecteur
+// de rôle ou de boutique, ces deux valeurs sont déduites côté serveur.
 @Component({
   selector: 'app-user-form',
   standalone: true,
@@ -15,14 +16,12 @@ import { Boutique } from '../../core/models/boutique.model';
 export class UserFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly usersService = inject(UsersService);
-  private readonly boutiquesService = inject(BoutiquesService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly isEdit = signal(false);
-  readonly boutiques = signal<Boutique[]>([]);
   private userId: string | null = null;
 
   readonly form = this.fb.nonNullable.group({
@@ -32,19 +31,14 @@ export class UserFormComponent implements OnInit {
     email: ['', Validators.email],
     username: ['', Validators.required],
     password: ['', Validators.minLength(8)],
-    role: ['EMPLOYEE' as 'EMPLOYEE' | 'SUPER_ADMIN', Validators.required],
-    boutiqueId: [''],
   });
 
   ngOnInit(): void {
-    this.boutiquesService.findAll({ limit: 100 }).subscribe((res) => this.boutiques.set(res.data));
-
     this.userId = this.route.snapshot.paramMap.get('id');
     if (this.userId) {
       this.isEdit.set(true);
       this.form.get('password')?.clearValidators();
       this.form.get('username')?.disable();
-      this.form.get('role')?.disable();
       this.usersService.findOne(this.userId).subscribe((user) => {
         this.form.patchValue({
           nom: user.nom,
@@ -52,8 +46,6 @@ export class UserFormComponent implements OnInit {
           telephone: user.telephone ?? '',
           email: user.email ?? '',
           username: user.username,
-          role: user.role,
-          boutiqueId: user.boutiqueId ?? '',
         });
       });
     } else {
@@ -71,21 +63,18 @@ export class UserFormComponent implements OnInit {
 
     const request = this.userId
       ? this.usersService.update(this.userId, {
-          nom: value.nom!,
-          prenom: value.prenom!,
+          nom: value.nom,
+          prenom: value.prenom,
           telephone: value.telephone || undefined,
           email: value.email || undefined,
-          boutiqueId: value.boutiqueId || undefined,
         })
       : this.usersService.create({
-          nom: value.nom!,
-          prenom: value.prenom!,
+          nom: value.nom,
+          prenom: value.prenom,
           telephone: value.telephone || undefined,
           email: value.email || undefined,
-          username: value.username!,
-          password: value.password!,
-          role: value.role!,
-          boutiqueId: value.role === 'EMPLOYEE' ? value.boutiqueId || undefined : undefined,
+          username: value.username,
+          password: value.password,
         });
 
     request.subscribe({

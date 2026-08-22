@@ -11,12 +11,6 @@
     (ngModelChange)="search.set($event)"
     (keyup.enter)="onFilterChange()"
   />
-  <select [ngModel]="boutiqueFilter()" (ngModelChange)="boutiqueFilter.set($event); onFilterChange()">
-    <option value="">Toutes les boutiques</option>
-    @for (b of boutiques(); track b.id) {
-      <option [value]="b.id">{{ b.nom }}</option>
-    }
-  </select>
   <button class="btn btn-secondary btn-sm" (click)="onFilterChange()">Rechercher</button>
 </div>
 
@@ -26,7 +20,6 @@
       <tr>
         <th>Nom</th>
         <th>SKU</th>
-        <th>Boutique</th>
         <th>Prix de vente</th>
         <th>Stock</th>
         <th>Statut</th>
@@ -38,7 +31,6 @@
         <tr>
           <td>{{ product.nom }}</td>
           <td>{{ product.sku || '—' }}</td>
-          <td>{{ boutiqueName(product.boutiqueId) }}</td>
           <td>{{ product.prixVente }} FCFA</td>
           <td>
             {{ product.quantiteDisponible }}
@@ -62,7 +54,7 @@
         </tr>
       }
       @if (!products().length) {
-        <tr><td colspan="7" class="empty-state">Aucun produit.</td></tr>
+        <tr><td colspan="6" class="empty-state">Aucun produit.</td></tr>
       }
     </tbody>
   </table>

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { DashboardOverview, SalesByBoutique, SalesByEmployee } from '../models/dashboard.model';
+import { DashboardOverview, SalesByEmployee } from '../models/dashboard.model';
 import { Sale } from '../models/sale.model';
 
 @Injectable({ providedIn: 'root' })
@@ -13,10 +13,6 @@ export class DashboardService {
 
   getOverview(): Observable<DashboardOverview> {
     return this.http.get<DashboardOverview>(`${this.baseUrl}/overview`);
-  }
-
-  getSalesByBoutique(): Observable<SalesByBoutique[]> {
-    return this.http.get<SalesByBoutique[]>(`${this.baseUrl}/sales-by-boutique`);
   }
 
   getSalesByEmployee(): Observable<SalesByEmployee[]> {

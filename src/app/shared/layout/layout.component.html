@@ -2,7 +2,7 @@
   <aside class="sidenav">
     <div class="brand">GesBoutik</div>
     <nav>
-      @for (link of navLinks; track link.path) {
+      @for (link of navLinks(); track link.path) {
         <a [routerLink]="link.path" routerLinkActive="active">{{ link.label }}</a>
       }
     </nav>

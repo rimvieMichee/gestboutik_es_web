@@ -29,12 +29,20 @@ export class BoutiqueFormComponent implements OnInit {
     email: ['', Validators.email],
     adresse: [''],
     ville: [''],
+    adminNom: [''],
+    adminPrenom: [''],
+    adminUsername: [''],
+    adminPassword: [''],
   });
 
   ngOnInit(): void {
     this.boutiqueId = this.route.snapshot.paramMap.get('id');
     if (this.boutiqueId) {
       this.isEdit.set(true);
+      // Le compte Admin ne se crée qu'à la création de la boutique, pas à sa
+      // modification : les champs restent dans le groupe (typage strict des
+      // formulaires réactifs) mais sans validateur, masqués côté template,
+      // et ignorés par cleanPayload/UpdateBoutiquePayload à l'envoi.
       this.boutiquesService.findOne(this.boutiqueId).subscribe((boutique) => {
         this.form.patchValue({
           nom: boutique.nom,
@@ -45,6 +53,11 @@ export class BoutiqueFormComponent implements OnInit {
           ville: boutique.ville ?? '',
         });
       });
+    } else {
+      this.form.get('adminNom')?.setValidators(Validators.required);
+      this.form.get('adminPrenom')?.setValidators(Validators.required);
+      this.form.get('adminUsername')?.setValidators(Validators.required);
+      this.form.get('adminPassword')?.setValidators([Validators.required, Validators.minLength(8)]);
     }
   }
 
@@ -54,11 +67,18 @@ export class BoutiqueFormComponent implements OnInit {
     }
     this.loading.set(true);
     this.errorMessage.set(null);
-    const payload = cleanPayload(this.form.getRawValue());
+    const value = this.form.getRawValue();
 
     const request = this.boutiqueId
-      ? this.boutiquesService.update(this.boutiqueId, payload)
-      : this.boutiquesService.create({ ...payload, nom: payload.nom! });
+      ? this.boutiquesService.update(this.boutiqueId, cleanPayload(value))
+      : this.boutiquesService.create({
+          ...cleanPayload(value),
+          nom: value.nom,
+          adminNom: value.adminNom!,
+          adminPrenom: value.adminPrenom!,
+          adminUsername: value.adminUsername!,
+          adminPassword: value.adminPassword!,
+        });
 
     request.subscribe({
       next: () => this.router.navigate(['/boutiques']),

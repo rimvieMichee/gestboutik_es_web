@@ -3,9 +3,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { SalesService } from '../../core/services/sales.service';
-import { BoutiquesService } from '../../core/services/boutiques.service';
 import { Sale } from '../../core/models/sale.model';
-import { Boutique } from '../../core/models/boutique.model';
 import { PaginationMeta } from '../../core/models/common.model';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 
@@ -17,20 +15,14 @@ import { PaginationComponent } from '../../shared/components/pagination/paginati
 })
 export class SalesListComponent implements OnInit {
   readonly sales = signal<Sale[]>([]);
-  readonly boutiques = signal<Boutique[]>([]);
   readonly meta = signal<PaginationMeta | null>(null);
-  readonly boutiqueFilter = signal('');
   readonly dateFrom = signal('');
   readonly dateTo = signal('');
   private page = 1;
 
-  constructor(
-    private salesService: SalesService,
-    private boutiquesService: BoutiquesService,
-  ) {}
+  constructor(private salesService: SalesService) {}
 
   ngOnInit(): void {
-    this.boutiquesService.findAll({ limit: 100 }).subscribe((res) => this.boutiques.set(res.data));
     this.load();
   }
 
@@ -39,7 +31,6 @@ export class SalesListComponent implements OnInit {
       .findAll({
         page: this.page,
         limit: 20,
-        boutiqueId: this.boutiqueFilter() || undefined,
         dateFrom: this.dateFrom() || undefined,
         dateTo: this.dateTo() || undefined,
       })

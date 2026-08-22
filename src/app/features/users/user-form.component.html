@@ -21,26 +21,6 @@
       <label for="password">Mot de passe (min. 8 caractères) *</label>
       <input id="password" type="password" formControlName="password" />
     </div>
-
-    <div class="form-field">
-      <label for="role">Rôle *</label>
-      <select id="role" formControlName="role">
-        <option value="EMPLOYEE">Employé</option>
-        <option value="SUPER_ADMIN">Super administrateur</option>
-      </select>
-    </div>
-  }
-
-  @if (form.get('role')?.value === 'EMPLOYEE') {
-    <div class="form-field">
-      <label for="boutiqueId">Boutique *</label>
-      <select id="boutiqueId" formControlName="boutiqueId">
-        <option value="">— Sélectionner —</option>
-        @for (b of boutiques(); track b.id) {
-          <option [value]="b.id">{{ b.nom }}</option>
-        }
-      </select>
-    </div>
   }
 
   <div class="form-field">

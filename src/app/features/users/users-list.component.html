@@ -20,8 +20,6 @@
       <tr>
         <th>Nom</th>
         <th>Identifiant</th>
-        <th>Rôle</th>
-        <th>Boutique</th>
         <th>Statut</th>
         <th>Actions</th>
       </tr>
@@ -31,8 +29,6 @@
         <tr>
           <td>{{ user.prenom }} {{ user.nom }}</td>
           <td>{{ user.username }}</td>
-          <td>{{ user.role === 'SUPER_ADMIN' ? 'Admin' : 'Employé' }}</td>
-          <td>{{ user.boutique?.nom || '—' }}</td>
           <td>
             <span class="badge" [class.badge-success]="user.statut === 'ACTIVE'" [class.badge-danger]="user.statut === 'INACTIVE'">
               {{ user.statut === 'ACTIVE' ? 'Actif' : 'Inactif' }}
@@ -48,7 +44,7 @@
         </tr>
       }
       @if (!users().length) {
-        <tr><td colspan="6" class="empty-state">Aucun employé.</td></tr>
+        <tr><td colspan="4" class="empty-state">Aucun employé.</td></tr>
       }
     </tbody>
   </table>

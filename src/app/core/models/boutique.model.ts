@@ -13,6 +13,8 @@ export interface Boutique {
   updatedAt: string;
 }
 
+// Le SUPER_ADMIN crée la boutique et son administrateur en une seule étape :
+// c'est ce compte Admin qui gérera ensuite les employés de la boutique.
 export interface CreateBoutiquePayload {
   nom: string;
   description?: string;
@@ -20,6 +22,16 @@ export interface CreateBoutiquePayload {
   email?: string;
   adresse?: string;
   ville?: string;
+  adminNom: string;
+  adminPrenom: string;
+  adminUsername: string;
+  adminPassword: string;
 }
 
-export type UpdateBoutiquePayload = Partial<CreateBoutiquePayload>;
+export type UpdateBoutiquePayload = Partial<
+  Omit<CreateBoutiquePayload, 'adminNom' | 'adminPrenom' | 'adminUsername' | 'adminPassword'>
+>;
+
+export interface BoutiqueWithAdmin extends Boutique {
+  admin: { id: string; nom: string; prenom: string; username: string };
+}

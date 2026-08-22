@@ -3,10 +3,10 @@ export interface SalesAggregate {
   chiffreAffaires: string;
 }
 
+// Tableau de bord de l'ADMIN, toujours scopé à SA boutique.
 export interface DashboardOverview {
-  totalBoutiques: number;
-  activeBoutiques: number;
   totalEmployees: number;
+  totalProducts: number;
   totalSales: number;
   chiffreAffaires: string;
   ventesDuJour: SalesAggregate;
@@ -14,17 +14,9 @@ export interface DashboardOverview {
   ventesMois: SalesAggregate;
 }
 
-export interface SalesByBoutique {
-  boutiqueId: string;
-  boutiqueNom: string;
-  nombreVentes: number;
-  chiffreAffaires: string;
-}
-
 export interface SalesByEmployee {
   userId: string;
   nomComplet: string;
-  boutique: { id: string; nom: string } | null;
   nombreVentes: number;
   chiffreAffaires: string;
 }

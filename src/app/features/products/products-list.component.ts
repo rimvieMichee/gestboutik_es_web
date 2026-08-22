@@ -2,9 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProductsService } from '../../core/services/products.service';
-import { BoutiquesService } from '../../core/services/boutiques.service';
 import { Product } from '../../core/models/product.model';
-import { Boutique } from '../../core/models/boutique.model';
 import { PaginationMeta } from '../../core/models/common.model';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 
@@ -16,29 +14,21 @@ import { PaginationComponent } from '../../shared/components/pagination/paginati
 })
 export class ProductsListComponent implements OnInit {
   readonly products = signal<Product[]>([]);
-  readonly boutiques = signal<Boutique[]>([]);
   readonly meta = signal<PaginationMeta | null>(null);
   readonly search = signal('');
-  readonly boutiqueFilter = signal('');
   private page = 1;
 
-  constructor(
-    private productsService: ProductsService,
-    private boutiquesService: BoutiquesService,
-  ) {}
+  constructor(private productsService: ProductsService) {}
 
   ngOnInit(): void {
-    this.boutiquesService.findAll({ limit: 100 }).subscribe((res) => this.boutiques.set(res.data));
     this.load();
   }
 
   load(): void {
-    this.productsService
-      .findAll({ page: this.page, limit: 20, search: this.search(), boutiqueId: this.boutiqueFilter() || undefined })
-      .subscribe((res) => {
-        this.products.set(res.data);
-        this.meta.set(res.meta);
-      });
+    this.productsService.findAll({ page: this.page, limit: 20, search: this.search() }).subscribe((res) => {
+      this.products.set(res.data);
+      this.meta.set(res.meta);
+    });
   }
 
   onFilterChange(): void {
@@ -49,10 +39,6 @@ export class ProductsListComponent implements OnInit {
   onPageChange(page: number): void {
     this.page = page;
     this.load();
-  }
-
-  boutiqueName(id: string): string {
-    return this.boutiques().find((b) => b.id === id)?.nom ?? '—';
   }
 
   toggleStatus(product: Product): void {
