@@ -1,0 +1,70 @@
+<div class="page-header">
+  <h1>Produits</h1>
+  <a class="btn" routerLink="/products/new">+ Nouveau produit</a>
+</div>
+
+<div class="toolbar">
+  <input
+    type="text"
+    placeholder="Rechercher par nom ou SKU..."
+    [ngModel]="search()"
+    (ngModelChange)="search.set($event)"
+    (keyup.enter)="onFilterChange()"
+  />
+  <select [ngModel]="boutiqueFilter()" (ngModelChange)="boutiqueFilter.set($event); onFilterChange()">
+    <option value="">Toutes les boutiques</option>
+    @for (b of boutiques(); track b.id) {
+      <option [value]="b.id">{{ b.nom }}</option>
+    }
+  </select>
+  <button class="btn btn-secondary btn-sm" (click)="onFilterChange()">Rechercher</button>
+</div>
+
+<div class="card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>SKU</th>
+        <th>Boutique</th>
+        <th>Prix de vente</th>
+        <th>Stock</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (product of products(); track product.id) {
+        <tr>
+          <td>{{ product.nom }}</td>
+          <td>{{ product.sku || '—' }}</td>
+          <td>{{ boutiqueName(product.boutiqueId) }}</td>
+          <td>{{ product.prixVente }} FCFA</td>
+          <td>
+            {{ product.quantiteDisponible }}
+            @if (product.quantiteDisponible <= product.seuilAlerte) {
+              <span class="badge badge-danger">Seuil bas</span>
+            }
+          </td>
+          <td>
+            <span class="badge" [class.badge-success]="product.statut === 'ACTIVE'" [class.badge-danger]="product.statut === 'INACTIVE'">
+              {{ product.statut === 'ACTIVE' ? 'Actif' : 'Inactif' }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <a class="btn btn-secondary btn-sm" [routerLink]="['/products', product.id, 'edit']">Modifier</a>
+            <button class="btn btn-secondary btn-sm" (click)="restock(product)">Réassort</button>
+            <button class="btn btn-secondary btn-sm" (click)="adjust(product)">Ajuster</button>
+            <button class="btn btn-sm" [class.btn-danger]="product.statut === 'ACTIVE'" (click)="toggleStatus(product)">
+              {{ product.statut === 'ACTIVE' ? 'Désactiver' : 'Activer' }}
+            </button>
+          </td>
+        </tr>
+      }
+      @if (!products().length) {
+        <tr><td colspan="7" class="empty-state">Aucun produit.</td></tr>
+      }
+    </tbody>
+  </table>
+  <app-pagination [meta]="meta()" (pageChange)="onPageChange($event)" />
+</div>

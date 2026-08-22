@@ -1,0 +1,44 @@
+<h1>{{ isEdit() ? 'Modifier la boutique' : 'Nouvelle boutique' }}</h1>
+
+<form class="card" style="max-width: 480px" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="form-field">
+    <label for="nom">Nom *</label>
+    <input id="nom" type="text" formControlName="nom" />
+  </div>
+
+  <div class="form-field">
+    <label for="description">Description</label>
+    <textarea id="description" formControlName="description" rows="2"></textarea>
+  </div>
+
+  <div class="form-field">
+    <label for="telephone">Téléphone</label>
+    <input id="telephone" type="text" formControlName="telephone" />
+  </div>
+
+  <div class="form-field">
+    <label for="email">Email</label>
+    <input id="email" type="email" formControlName="email" />
+  </div>
+
+  <div class="form-field">
+    <label for="adresse">Adresse</label>
+    <input id="adresse" type="text" formControlName="adresse" />
+  </div>
+
+  <div class="form-field">
+    <label for="ville">Ville</label>
+    <input id="ville" type="text" formControlName="ville" />
+  </div>
+
+  @if (errorMessage()) {
+    <p class="error-text">{{ errorMessage() }}</p>
+  }
+
+  <div class="toolbar">
+    <button class="btn" type="submit" [disabled]="form.invalid || loading()">
+      {{ loading() ? 'Enregistrement...' : 'Enregistrer' }}
+    </button>
+    <a class="btn btn-secondary" routerLink="/boutiques">Annuler</a>
+  </div>
+</form>

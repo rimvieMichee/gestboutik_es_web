@@ -1,0 +1,39 @@
+@if (sale(); as s) {
+  <div class="page-header">
+    <h1>Vente {{ s.numeroVente }}</h1>
+    <a class="btn btn-secondary" routerLink="/sales">Retour</a>
+  </div>
+
+  <div class="card" style="max-width: 560px">
+    <p><strong>Boutique :</strong> {{ s.boutique?.nom }}</p>
+    <p><strong>Employé :</strong> {{ s.user?.prenom }} {{ s.user?.nom }}</p>
+    <p><strong>Date :</strong> {{ s.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th>Quantité</th>
+          <th>Prix unitaire</th>
+          <th>Sous-total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of s.items; track item.id) {
+          <tr>
+            <td>{{ item.product.nom }}</td>
+            <td>{{ item.quantite }}</td>
+            <td>{{ item.prixUnitaire }} FCFA</td>
+            <td>{{ item.sousTotal }} FCFA</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3"><strong>Total</strong></td>
+          <td><strong>{{ s.montantTotal }} FCFA</strong></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+}

@@ -1,0 +1,66 @@
+<h1>{{ isEdit() ? 'Modifier l\'employé' : 'Nouvel employé' }}</h1>
+
+<form class="card" style="max-width: 480px" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="form-field">
+    <label for="prenom">Prénom *</label>
+    <input id="prenom" type="text" formControlName="prenom" />
+  </div>
+
+  <div class="form-field">
+    <label for="nom">Nom *</label>
+    <input id="nom" type="text" formControlName="nom" />
+  </div>
+
+  <div class="form-field">
+    <label for="username">Identifiant de connexion *</label>
+    <input id="username" type="text" formControlName="username" />
+  </div>
+
+  @if (!isEdit()) {
+    <div class="form-field">
+      <label for="password">Mot de passe (min. 8 caractères) *</label>
+      <input id="password" type="password" formControlName="password" />
+    </div>
+
+    <div class="form-field">
+      <label for="role">Rôle *</label>
+      <select id="role" formControlName="role">
+        <option value="EMPLOYEE">Employé</option>
+        <option value="SUPER_ADMIN">Super administrateur</option>
+      </select>
+    </div>
+  }
+
+  @if (form.get('role')?.value === 'EMPLOYEE') {
+    <div class="form-field">
+      <label for="boutiqueId">Boutique *</label>
+      <select id="boutiqueId" formControlName="boutiqueId">
+        <option value="">— Sélectionner —</option>
+        @for (b of boutiques(); track b.id) {
+          <option [value]="b.id">{{ b.nom }}</option>
+        }
+      </select>
+    </div>
+  }
+
+  <div class="form-field">
+    <label for="telephone">Téléphone</label>
+    <input id="telephone" type="text" formControlName="telephone" />
+  </div>
+
+  <div class="form-field">
+    <label for="email">Email</label>
+    <input id="email" type="email" formControlName="email" />
+  </div>
+
+  @if (errorMessage()) {
+    <p class="error-text">{{ errorMessage() }}</p>
+  }
+
+  <div class="toolbar">
+    <button class="btn" type="submit" [disabled]="form.invalid || loading()">
+      {{ loading() ? 'Enregistrement...' : 'Enregistrer' }}
+    </button>
+    <a class="btn btn-secondary" routerLink="/users">Annuler</a>
+  </div>
+</form>

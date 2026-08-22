@@ -1,0 +1,53 @@
+<div class="page-header">
+  <h1>Boutiques</h1>
+  <a class="btn" routerLink="/boutiques/new">+ Nouvelle boutique</a>
+</div>
+
+<div class="toolbar">
+  <input
+    type="text"
+    placeholder="Rechercher par nom ou ville..."
+    [ngModel]="search()"
+    (ngModelChange)="search.set($event)"
+    (keyup.enter)="onSearch()"
+  />
+  <button class="btn btn-secondary btn-sm" (click)="onSearch()">Rechercher</button>
+</div>
+
+<div class="card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Ville</th>
+        <th>Téléphone</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (boutique of boutiques(); track boutique.id) {
+        <tr>
+          <td>{{ boutique.nom }}</td>
+          <td>{{ boutique.ville || '—' }}</td>
+          <td>{{ boutique.telephone || '—' }}</td>
+          <td>
+            <span class="badge" [class.badge-success]="boutique.statut === 'ACTIVE'" [class.badge-danger]="boutique.statut === 'INACTIVE'">
+              {{ boutique.statut === 'ACTIVE' ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <a class="btn btn-secondary btn-sm" [routerLink]="['/boutiques', boutique.id, 'edit']">Modifier</a>
+            <button class="btn btn-sm" [class.btn-danger]="boutique.statut === 'ACTIVE'" (click)="toggleStatus(boutique)">
+              {{ boutique.statut === 'ACTIVE' ? 'Désactiver' : 'Activer' }}
+            </button>
+          </td>
+        </tr>
+      }
+      @if (!boutiques().length) {
+        <tr><td colspan="5" class="empty-state">Aucune boutique.</td></tr>
+      }
+    </tbody>
+  </table>
+  <app-pagination [meta]="meta()" (pageChange)="onPageChange($event)" />
+</div>

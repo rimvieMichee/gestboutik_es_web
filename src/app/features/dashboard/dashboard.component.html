@@ -1,0 +1,120 @@
+<h1>Tableau de bord</h1>
+
+@if (overview(); as ov) {
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Boutiques ({{ ov.activeBoutiques }} actives)</div>
+      <div class="stat-value">{{ ov.totalBoutiques }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Employés</div>
+      <div class="stat-value">{{ ov.totalEmployees }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ventes totales</div>
+      <div class="stat-value">{{ ov.totalSales }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Chiffre d'affaires total</div>
+      <div class="stat-value">{{ ov.chiffreAffaires }} FCFA</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ventes du jour</div>
+      <div class="stat-value">{{ ov.ventesDuJour.nombreVentes }}</div>
+      <div class="stat-label">{{ ov.ventesDuJour.chiffreAffaires }} FCFA</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ventes de la semaine</div>
+      <div class="stat-value">{{ ov.ventesSemaine.nombreVentes }}</div>
+      <div class="stat-label">{{ ov.ventesSemaine.chiffreAffaires }} FCFA</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ventes du mois</div>
+      <div class="stat-value">{{ ov.ventesMois.nombreVentes }}</div>
+      <div class="stat-label">{{ ov.ventesMois.chiffreAffaires }} FCFA</div>
+    </div>
+  </div>
+}
+
+<div class="dashboard-grid">
+  <div class="card">
+    <h3>Ventes par boutique</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Boutique</th>
+          <th>Nb ventes</th>
+          <th>Chiffre d'affaires</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of salesByBoutique(); track row.boutiqueId) {
+          <tr>
+            <td>{{ row.boutiqueNom }}</td>
+            <td>{{ row.nombreVentes }}</td>
+            <td>{{ row.chiffreAffaires }} FCFA</td>
+          </tr>
+        }
+        @if (!salesByBoutique().length) {
+          <tr><td colspan="3" class="empty-state">Aucune vente encore.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Ventes par employé</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Employé</th>
+          <th>Boutique</th>
+          <th>Nb ventes</th>
+          <th>Chiffre d'affaires</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of salesByEmployee(); track row.userId) {
+          <tr>
+            <td>{{ row.nomComplet }}</td>
+            <td>{{ row.boutique?.nom ?? '—' }}</td>
+            <td>{{ row.nombreVentes }}</td>
+            <td>{{ row.chiffreAffaires }} FCFA</td>
+          </tr>
+        }
+        @if (!salesByEmployee().length) {
+          <tr><td colspan="4" class="empty-state">Aucune vente encore.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Dernières ventes</h3>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>N° vente</th>
+        <th>Boutique</th>
+        <th>Employé</th>
+        <th>Date</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (sale of recentSales(); track sale.id) {
+        <tr>
+          <td>{{ sale.numeroVente }}</td>
+          <td>{{ sale.boutique?.nom }}</td>
+          <td>{{ sale.user?.prenom }} {{ sale.user?.nom }}</td>
+          <td>{{ sale.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ sale.montantTotal }} FCFA</td>
+        </tr>
+      }
+      @if (!loading() && !recentSales().length) {
+        <tr><td colspan="5" class="empty-state">Aucune vente encore.</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,45 @@
+<h1>Ventes</h1>
+
+<div class="toolbar">
+  <select [ngModel]="boutiqueFilter()" (ngModelChange)="boutiqueFilter.set($event); onFilterChange()">
+    <option value="">Toutes les boutiques</option>
+    @for (b of boutiques(); track b.id) {
+      <option [value]="b.id">{{ b.nom }}</option>
+    }
+  </select>
+  <input type="date" [ngModel]="dateFrom()" (ngModelChange)="dateFrom.set($event); onFilterChange()" />
+  <input type="date" [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event); onFilterChange()" />
+</div>
+
+<div class="card">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>N° vente</th>
+        <th>Boutique</th>
+        <th>Employé</th>
+        <th>Date</th>
+        <th>Total</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (sale of sales(); track sale.id) {
+        <tr>
+          <td>{{ sale.numeroVente }}</td>
+          <td>{{ sale.boutique?.nom }}</td>
+          <td>{{ sale.user?.prenom }} {{ sale.user?.nom }}</td>
+          <td>{{ sale.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ sale.montantTotal }} FCFA</td>
+          <td>
+            <a class="btn btn-secondary btn-sm" [routerLink]="['/sales', sale.id]">Détail</a>
+          </td>
+        </tr>
+      }
+      @if (!sales().length) {
+        <tr><td colspan="6" class="empty-state">Aucune vente.</td></tr>
+      }
+    </tbody>
+  </table>
+  <app-pagination [meta]="meta()" (pageChange)="onPageChange($event)" />
+</div>
