@@ -1,5 +1,5 @@
-import { Component, computed } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, computed, signal } from '@angular/core';
+import { NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { IconComponent } from '../components/icon/icon.component';
 import { FullNamePipe } from '../pipes/full-name.pipe';
@@ -25,10 +25,28 @@ export class LayoutComponent {
     this.authService.currentUser()?.role === 'SUPER_ADMIN' ? SUPER_ADMIN_NAV : ADMIN_NAV,
   );
 
+  // Menu burger : masqué par défaut sur mobile, ouvert en tiroir par-dessus le contenu.
+  readonly menuOpen = signal(false);
+
   constructor(
     readonly authService: AuthService,
     private router: Router,
-  ) {}
+  ) {
+    // Referme le menu à chaque navigation (clic sur un lien, retour navigateur...).
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationStart) {
+        this.menuOpen.set(false);
+      }
+    });
+  }
+
+  toggleMenu(): void {
+    this.menuOpen.set(!this.menuOpen());
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false);
+  }
 
   logout(): void {
     this.authService.logout();

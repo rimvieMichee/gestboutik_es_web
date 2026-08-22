@@ -50,6 +50,12 @@ import { Component, Input } from '@angular/core';
           <path d="M15.5 16 20 12l-4.5-4" />
           <path d="M20 12H9" />
         }
+        @case ('menu') {
+          <path d="M4 6.5h16M4 12h16M4 17.5h16" />
+        }
+        @case ('close') {
+          <path d="M5.5 5.5l13 13M18.5 5.5l-13 13" />
+        }
       }
     </svg>
   `,
