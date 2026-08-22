@@ -3,11 +3,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { SalesService } from '../../core/services/sales.service';
 import { Sale } from '../../core/models/sale.model';
+import { FullNamePipe } from '../../shared/pipes/full-name.pipe';
 
 @Component({
   selector: 'app-sale-detail',
   standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, FullNamePipe],
   templateUrl: './sale-detail.component.html',
 })
 export class SaleDetailComponent implements OnInit {

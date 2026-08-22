@@ -2,16 +2,6 @@
 
 <form class="card" style="max-width: 480px" [formGroup]="form" (ngSubmit)="submit()">
   <div class="form-field">
-    <label for="prenom">Prénom *</label>
-    <input id="prenom" type="text" formControlName="prenom" />
-  </div>
-
-  <div class="form-field">
-    <label for="nom">Nom *</label>
-    <input id="nom" type="text" formControlName="nom" />
-  </div>
-
-  <div class="form-field">
     <label for="username">Identifiant de connexion *</label>
     <input id="username" type="text" formControlName="username" />
   </div>
@@ -21,17 +11,30 @@
       <label for="password">Mot de passe (min. 8 caractères) *</label>
       <input id="password" type="password" formControlName="password" />
     </div>
+    <p class="form-hint">Le nom, prénom et autres informations pourront être complétés plus tard, depuis "Modifier".</p>
   }
 
-  <div class="form-field">
-    <label for="telephone">Téléphone</label>
-    <input id="telephone" type="text" formControlName="telephone" />
-  </div>
+  @if (isEdit()) {
+    <div class="form-field">
+      <label for="prenom">Prénom</label>
+      <input id="prenom" type="text" formControlName="prenom" />
+    </div>
 
-  <div class="form-field">
-    <label for="email">Email</label>
-    <input id="email" type="email" formControlName="email" />
-  </div>
+    <div class="form-field">
+      <label for="nom">Nom</label>
+      <input id="nom" type="text" formControlName="nom" />
+    </div>
+
+    <div class="form-field">
+      <label for="telephone">Téléphone</label>
+      <input id="telephone" type="text" formControlName="telephone" />
+    </div>
+
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" />
+    </div>
+  }
 
   @if (errorMessage()) {
     <p class="error-text">{{ errorMessage() }}</p>

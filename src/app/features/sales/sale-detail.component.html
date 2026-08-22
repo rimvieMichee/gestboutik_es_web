@@ -6,7 +6,7 @@
 
   <div class="card" style="max-width: 560px">
     <p><strong>Boutique :</strong> {{ s.boutique?.nom }}</p>
-    <p><strong>Employé :</strong> {{ s.user?.prenom }} {{ s.user?.nom }}</p>
+    <p><strong>Employé :</strong> {{ s.user | fullName }}</p>
     <p><strong>Date :</strong> {{ s.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
 
     <table class="data-table">

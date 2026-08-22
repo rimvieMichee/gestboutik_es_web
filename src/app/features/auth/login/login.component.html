@@ -1,24 +1,32 @@
 <div class="login-page">
-  <form class="card login-card" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="login-panel">
+    <div class="brand-mark">G</div>
     <h1>GesBoutik</h1>
-    <p class="subtitle">Espace administrateur</p>
+    <p class="tagline">Plateforme de gestion de boutiques</p>
+  </div>
 
-    <div class="form-field">
-      <label for="username">Nom d'utilisateur</label>
-      <input id="username" type="text" formControlName="username" autocomplete="username" />
-    </div>
+  <div class="login-form-side">
+    <form class="login-card" [formGroup]="form" (ngSubmit)="submit()">
+      <h2>Connexion</h2>
+      <p class="subtitle">Accédez à votre espace d'administration</p>
 
-    <div class="form-field">
-      <label for="password">Mot de passe</label>
-      <input id="password" type="password" formControlName="password" autocomplete="current-password" />
-    </div>
+      <div class="form-field">
+        <label for="username">Nom d'utilisateur</label>
+        <input id="username" type="text" formControlName="username" autocomplete="username" />
+      </div>
 
-    @if (errorMessage()) {
-      <p class="error-text">{{ errorMessage() }}</p>
-    }
+      <div class="form-field">
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password" formControlName="password" autocomplete="current-password" />
+      </div>
 
-    <button class="btn" type="submit" [disabled]="form.invalid || loading()">
-      {{ loading() ? 'Connexion...' : 'Se connecter' }}
-    </button>
-  </form>
+      @if (errorMessage()) {
+        <p class="error-text">{{ errorMessage() }}</p>
+      }
+
+      <button class="btn" type="submit" [disabled]="form.invalid || loading()">
+        {{ loading() ? 'Connexion...' : 'Se connecter' }}
+      </button>
+    </form>
+  </div>
 </div>

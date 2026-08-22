@@ -27,7 +27,7 @@
     <tbody>
       @for (user of users(); track user.id) {
         <tr>
-          <td>{{ user.prenom }} {{ user.nom }}</td>
+          <td>{{ user.prenom ? user.prenom + ' ' + user.nom : user.nom }}</td>
           <td>{{ user.username }}</td>
           <td>
             <span class="badge" [class.badge-success]="user.statut === 'ACTIVE'" [class.badge-danger]="user.statut === 'INACTIVE'">

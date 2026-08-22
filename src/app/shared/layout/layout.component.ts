@@ -1,20 +1,22 @@
 import { Component, computed } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { IconComponent } from '../components/icon/icon.component';
+import { FullNamePipe } from '../pipes/full-name.pipe';
 
-const SUPER_ADMIN_NAV = [{ path: '/boutiques', label: 'Boutiques' }];
+const SUPER_ADMIN_NAV = [{ path: '/boutiques', label: 'Boutiques', icon: 'store' }];
 
 const ADMIN_NAV = [
-  { path: '/dashboard', label: 'Tableau de bord' },
-  { path: '/users', label: 'Employés' },
-  { path: '/products', label: 'Produits' },
-  { path: '/sales', label: 'Ventes' },
+  { path: '/dashboard', label: 'Tableau de bord', icon: 'grid' },
+  { path: '/users', label: 'Employés', icon: 'users' },
+  { path: '/products', label: 'Produits', icon: 'box' },
+  { path: '/sales', label: 'Ventes', icon: 'receipt' },
 ];
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent, FullNamePipe],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
 })

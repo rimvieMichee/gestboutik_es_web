@@ -6,7 +6,9 @@ import { ProductsService } from '../../core/services/products.service';
 
 // Cette page n'est accessible qu'à l'ADMIN d'une boutique (voir roleGuard) :
 // le produit créé appartient toujours à SA boutique, déduite côté serveur —
-// pas de sélecteur de boutique ici.
+// pas de sélecteur de boutique ici. Formulaire volontairement minimal : nom,
+// prix, stock, seuil d'alerte (SKU/description/prix d'achat ne sont pas
+// demandés dans ce flux).
 @Component({
   selector: 'app-product-form',
   standalone: true,
@@ -26,11 +28,8 @@ export class ProductFormComponent implements OnInit {
 
   readonly form = this.fb.nonNullable.group({
     nom: ['', Validators.required],
-    description: [''],
-    sku: [''],
     prixVente: [0, [Validators.required, Validators.min(0.01)]],
-    prixAchat: [0],
-    quantiteDisponible: [0, [Validators.min(0)]],
+    quantiteDisponible: [0, [Validators.required, Validators.min(0)]],
     seuilAlerte: [0, [Validators.min(0)]],
   });
 
@@ -42,10 +41,7 @@ export class ProductFormComponent implements OnInit {
       this.productsService.findOne(this.productId).subscribe((product) => {
         this.form.patchValue({
           nom: product.nom,
-          description: product.description ?? '',
-          sku: product.sku ?? '',
           prixVente: Number(product.prixVente),
-          prixAchat: product.prixAchat ? Number(product.prixAchat) : 0,
           quantiteDisponible: product.quantiteDisponible,
           seuilAlerte: product.seuilAlerte,
         });
@@ -64,18 +60,12 @@ export class ProductFormComponent implements OnInit {
     const request = this.productId
       ? this.productsService.update(this.productId, {
           nom: value.nom,
-          description: value.description || undefined,
-          sku: value.sku || undefined,
           prixVente: value.prixVente,
-          prixAchat: value.prixAchat || undefined,
           seuilAlerte: value.seuilAlerte,
         })
       : this.productsService.create({
           nom: value.nom,
-          description: value.description || undefined,
-          sku: value.sku || undefined,
           prixVente: value.prixVente,
-          prixAchat: value.prixAchat || undefined,
           quantiteDisponible: value.quantiteDisponible,
           seuilAlerte: value.seuilAlerte,
         });

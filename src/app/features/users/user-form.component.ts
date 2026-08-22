@@ -25,8 +25,8 @@ export class UserFormComponent implements OnInit {
   private userId: string | null = null;
 
   readonly form = this.fb.nonNullable.group({
-    nom: ['', Validators.required],
-    prenom: ['', Validators.required],
+    nom: [''],
+    prenom: [''],
     telephone: [''],
     email: ['', Validators.email],
     username: ['', Validators.required],
@@ -69,8 +69,8 @@ export class UserFormComponent implements OnInit {
           email: value.email || undefined,
         })
       : this.usersService.create({
-          nom: value.nom,
-          prenom: value.prenom,
+          nom: value.nom || undefined,
+          prenom: value.prenom || undefined,
           telephone: value.telephone || undefined,
           email: value.email || undefined,
           username: value.username,

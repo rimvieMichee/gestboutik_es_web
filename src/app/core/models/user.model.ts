@@ -18,9 +18,11 @@ export interface AppUser {
 
 // Le rôle créé n'est jamais envoyé au serveur : il est déduit du rôle de
 // l'appelant (SUPER_ADMIN crée un ADMIN, ADMIN crée un EMPLOYEE de sa boutique).
+// nom/prenom optionnels : un ajout rapide ne nécessite que l'identifiant et
+// le mot de passe, le reste se complète plus tard via "Modifier".
 export interface CreateUserPayload {
-  nom: string;
-  prenom: string;
+  nom?: string;
+  prenom?: string;
   telephone?: string;
   email?: string;
   username: string;

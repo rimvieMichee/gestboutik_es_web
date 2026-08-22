@@ -20,7 +20,7 @@
       @for (sale of sales(); track sale.id) {
         <tr>
           <td>{{ sale.numeroVente }}</td>
-          <td>{{ sale.user?.prenom }} {{ sale.user?.nom }}</td>
+          <td>{{ sale.user | fullName }}</td>
           <td>{{ sale.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
           <td>{{ sale.montantTotal }} FCFA</td>
           <td>

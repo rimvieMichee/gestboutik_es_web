@@ -6,11 +6,12 @@ import { SalesService } from '../../core/services/sales.service';
 import { Sale } from '../../core/models/sale.model';
 import { PaginationMeta } from '../../core/models/common.model';
 import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
+import { FullNamePipe } from '../../shared/pipes/full-name.pipe';
 
 @Component({
   selector: 'app-sales-list',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe, PaginationComponent],
+  imports: [RouterLink, FormsModule, DatePipe, PaginationComponent, FullNamePipe],
   templateUrl: './sales-list.component.html',
 })
 export class SalesListComponent implements OnInit {

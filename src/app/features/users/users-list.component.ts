@@ -44,7 +44,8 @@ export class UsersListComponent implements OnInit {
   toggleStatus(user: AppUser): void {
     const next = user.statut === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     const action = next === 'INACTIVE' ? 'désactiver' : 'activer';
-    if (!confirm(`Confirmer : ${action} le compte de ${user.prenom} ${user.nom} ?`)) {
+    const fullName = user.prenom ? `${user.prenom} ${user.nom}` : user.nom;
+    if (!confirm(`Confirmer : ${action} le compte de ${fullName} ?`)) {
       return;
     }
     this.usersService.changeStatus(user.id, next).subscribe(() => this.load());
