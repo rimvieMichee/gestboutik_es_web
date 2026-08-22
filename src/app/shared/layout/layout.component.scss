@@ -149,7 +149,8 @@
 .page-content {
   padding: 1.75rem;
   flex: 1;
-  overflow-x: auto;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 @media (max-width: 768px) {
@@ -174,5 +175,24 @@
 
   .topbar .role-tag {
     display: none;
+  }
+
+  .page-content {
+    padding: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidenav {
+    width: 60px;
+    padding: 1rem 0.5rem;
+  }
+
+  .topbar {
+    padding: 0 1rem;
+
+    .user-name {
+      display: none;
+    }
   }
 }

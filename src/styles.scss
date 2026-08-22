@@ -57,6 +57,10 @@ a {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   padding: 1.5rem;
+  // Un tableau plus large que son conteneur défile dans la carte plutôt que
+  // de casser la mise en page de la page entière.
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .page-header {
@@ -179,12 +183,14 @@ hr {
 
 table.data-table {
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
   font-size: 0.875rem;
 
   th, td {
     text-align: left;
     padding: 0.75rem 0.9rem;
+    white-space: nowrap;
     border-bottom: 1px solid var(--color-border);
   }
 
@@ -282,6 +288,8 @@ table.data-table {
   input[type='text'],
   input[type='date'],
   select {
+    flex: 1 1 160px;
+    min-width: 0;
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     padding: 0.5rem 0.75rem;
@@ -314,7 +322,70 @@ table.data-table {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
   justify-content: flex-end;
   margin-top: 1.1rem;
   font-size: 0.85rem;
+
+  span {
+    flex: 1 1 100%;
+    order: -1;
+  }
+}
+
+// --- Responsive : tablette / mobile --------------------------------------
+@media (max-width: 640px) {
+  .page-header {
+    align-items: stretch;
+
+    h1 {
+      font-size: 1.25rem;
+    }
+
+    .btn {
+      justify-content: center;
+    }
+  }
+
+  .toolbar {
+    input[type='text'],
+    input[type='date'],
+    select,
+    button {
+      flex: 1 1 100%;
+    }
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 0.9rem 1rem;
+
+    .stat-value {
+      font-size: 1.4rem;
+    }
+  }
+
+  .actions-cell {
+    .btn-sm {
+      flex: 1 1 auto;
+    }
+  }
+
+  .pagination {
+    justify-content: center;
+
+    span {
+      text-align: center;
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
 }
