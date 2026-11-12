@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PaginatedResult, PaginationQuery } from '../models/common.model';
-import { AppUser, CreateUserPayload, Role, UpdateUserPayload, UserStatus } from '../models/user.model';
+import { AppUser, CreateUserPayload, Gestionnaire, Role, UpdateUserPayload, UserStatus } from '../models/user.model';
 import { toHttpParams } from './http-params.util';
 
 export interface UserQuery extends PaginationQuery {
   boutiqueId?: string;
   role?: Role;
+  statut?: UserStatus;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -17,8 +18,8 @@ export class UsersService {
 
   constructor(private http: HttpClient) {}
 
-  findAll(query: UserQuery = {}): Observable<PaginatedResult<AppUser>> {
-    return this.http.get<PaginatedResult<AppUser>>(this.baseUrl, { params: toHttpParams(query) });
+  findAll(query: UserQuery = {}): Observable<PaginatedResult<Gestionnaire>> {
+    return this.http.get<PaginatedResult<Gestionnaire>>(this.baseUrl, { params: toHttpParams(query) });
   }
 
   findOne(id: string): Observable<AppUser> {

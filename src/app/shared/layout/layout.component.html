@@ -5,8 +5,8 @@
 
   <aside class="sidenav" [class.open]="menuOpen()">
     <div class="brand">
-      <span class="brand-mark">G</span>
-      <span class="brand-name">GesBoutik</span>
+      <img class="brand-logo" src="selio-logo.svg" alt="SELIO" />
+      <img class="brand-icon" src="selio-mark.svg" alt="SELIO" />
     </div>
     <nav>
       @for (link of navLinks(); track link.path) {
@@ -28,8 +28,11 @@
         <app-icon [name]="menuOpen() ? 'close' : 'menu'" [size]="20" />
       </button>
       <div class="role-tag">
-        {{ authService.currentUser()?.role === 'SUPER_ADMIN' ? 'Super administrateur' : "Administrateur boutique" }}
+        Technicien
       </div>
+      <span class="live-badge" [class.on]="realtime.connected()" [title]="realtime.connected() ? 'Les chiffres se mettent à jour en direct' : 'Connexion temps réel interrompue : reconnexion en cours'">
+        <span class="live-dot"></span>{{ realtime.connected() ? 'En direct' : 'Hors ligne' }}
+      </span>
       @if (authService.currentUser(); as user) {
         <div class="user-info">
           <span class="user-avatar">{{ (user.prenom || user.nom).charAt(0) }}{{ user.prenom ? user.nom.charAt(0) : '' }}</span>
@@ -42,3 +45,5 @@
     </main>
   </div>
 </div>
+
+<app-confirm-dialog />

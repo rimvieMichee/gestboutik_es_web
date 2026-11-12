@@ -5,12 +5,18 @@ import { environment } from '../../../environments/environment';
 import { PaginatedResult, PaginationQuery } from '../models/common.model';
 import {
   Boutique,
+  BoutiqueOverview,
   BoutiqueStatus,
+  BoutiqueWithStats,
   BoutiqueWithAdmin,
   CreateBoutiquePayload,
   UpdateBoutiquePayload,
 } from '../models/boutique.model';
 import { toHttpParams } from './http-params.util';
+
+export interface BoutiqueQuery extends PaginationQuery {
+  statut?: BoutiqueStatus;
+}
 
 @Injectable({ providedIn: 'root' })
 export class BoutiquesService {
@@ -18,8 +24,12 @@ export class BoutiquesService {
 
   constructor(private http: HttpClient) {}
 
-  findAll(query: PaginationQuery = {}): Observable<PaginatedResult<Boutique>> {
-    return this.http.get<PaginatedResult<Boutique>>(this.baseUrl, { params: toHttpParams(query) });
+  findAll(query: BoutiqueQuery = {}): Observable<PaginatedResult<BoutiqueWithStats>> {
+    return this.http.get<PaginatedResult<BoutiqueWithStats>>(this.baseUrl, { params: toHttpParams(query) });
+  }
+
+  overview(id: string): Observable<BoutiqueOverview> {
+    return this.http.get<BoutiqueOverview>(`${this.baseUrl}/${id}/overview`);
   }
 
   findOne(id: string): Observable<Boutique> {

@@ -1,7 +1,7 @@
 <div class="login-page">
   <div class="login-panel">
-    <div class="brand-mark">G</div>
-    <h1>GesBoutik</h1>
+    <img class="brand-mark" src="selio-mark-light.svg" alt="SELIO" />
+    <h1>SELIO</h1>
     <p class="tagline">Plateforme de gestion de boutiques</p>
   </div>
 
@@ -17,7 +17,23 @@
 
       <div class="form-field">
         <label for="password">Mot de passe</label>
-        <input id="password" type="password" formControlName="password" autocomplete="current-password" />
+        <div class="password-wrapper">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePassword()"
+            [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+            [attr.aria-pressed]="showPassword()"
+          >
+            <app-icon [name]="showPassword() ? 'eye-off' : 'eye'" [size]="18" />
+          </button>
+        </div>
       </div>
 
       @if (errorMessage()) {

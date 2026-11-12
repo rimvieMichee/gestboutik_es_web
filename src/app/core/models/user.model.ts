@@ -32,3 +32,8 @@ export interface CreateUserPayload {
 }
 
 export type UpdateUserPayload = Partial<Omit<CreateUserPayload, 'password' | 'username' | 'boutiqueId'>>;
+
+/** Gestionnaire tel que listé pour le technicien. */
+export interface Gestionnaire extends AppUser {
+  derniereConnexion?: string | null;
+}

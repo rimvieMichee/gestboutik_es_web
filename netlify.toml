@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist/admin/browser"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Appli monopage : toute URL (ex. /boutiques/123 après un rechargement) doit
+# renvoyer index.html, sinon Netlify répond 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
