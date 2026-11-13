@@ -3,7 +3,9 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Boutique, BoutiqueStatus, BoutiqueWithStats } from '../../core/models/boutique.model';
 import { PaginationMeta } from '../../core/models/common.model';
+import { Gestionnaire } from '../../core/models/user.model';
 import { BoutiquesService } from '../../core/services/boutiques.service';
+import { UsersService } from '../../core/services/users.service';
 import { errorText } from '../../core/services/http-error.util';
 import { RealtimeService } from '../../core/services/realtime.service';
 import { isActivityNotLogin, onRealtime } from '../../core/services/realtime.util';
@@ -128,6 +130,7 @@ const SEVEN_DAYS = 7 * 24 * 3600 * 1000;
     <app-boutique-drawer
       [open]="drawerOpen()"
       [boutique]="editing()"
+      [gestionnaires]="gestionnaires()"
       (closed)="drawerOpen.set(false)"
       (saved)="load()"
     />
@@ -135,6 +138,7 @@ const SEVEN_DAYS = 7 * 24 * 3600 * 1000;
 })
 export class BoutiquesListComponent implements OnInit {
   private readonly boutiquesService = inject(BoutiquesService);
+  private readonly usersService = inject(UsersService);
   private readonly confirm = inject(ConfirmService);
   private readonly realtime = inject(RealtimeService);
   private readonly destroyRef = inject(DestroyRef);
@@ -147,9 +151,12 @@ export class BoutiquesListComponent implements OnInit {
   readonly errorMessage = signal<string | null>(null);
   readonly drawerOpen = signal(false);
   readonly editing = signal<Boutique | null>(null);
+  /** Gestionnaires existants : une nouvelle boutique peut leur être rattachée. */
+  readonly gestionnaires = signal<Gestionnaire[]>([]);
   private page = 1;
 
   ngOnInit(): void {
+    this.usersService.findAll({ limit: 100 }).subscribe((res) => this.gestionnaires.set(res.data));
     this.load();
     // Ventes, crédits, produits et comptes : les indicateurs de chaque boutique bougent en direct.
     onRealtime(

@@ -64,7 +64,7 @@ import { PasswordDrawerComponent } from './password-drawer.component';
         <thead>
           <tr>
             <th>Gestionnaire</th>
-            <th>Boutique</th>
+            <th>Boutiques</th>
             <th>Téléphone</th>
             <th>Dernière connexion</th>
             <th>Créé le</th>
@@ -90,9 +90,9 @@ import { PasswordDrawerComponent } from './password-drawer.component';
                 </span>
               </td>
               <td>
-                @if (user.boutique) {
-                  <a class="table-link" [routerLink]="['/boutiques', user.boutique.id]">{{ user.boutique.nom }}</a>
-                } @else {
+                @for (b of shopsOf(user); track b.id; let last = $last) {
+                  <a class="table-link" [routerLink]="['/boutiques', b.id]">{{ b.nom }}</a>{{ last ? '' : ', ' }}
+                } @empty {
                   <span class="muted">—</span>
                 }
               </td>
@@ -197,6 +197,12 @@ export class UsersListComponent implements OnInit {
   onPageChange(page: number): void {
     this.page = page;
     this.load();
+  }
+
+  /** Toutes les boutiques d'un gestionnaire (à défaut, sa boutique unique). */
+  shopsOf(u: Gestionnaire): Array<{ id: string; nom: string }> {
+    if (u.boutiques?.length) return u.boutiques;
+    return u.boutique ? [u.boutique] : [];
   }
 
   initials(u: Gestionnaire): string {

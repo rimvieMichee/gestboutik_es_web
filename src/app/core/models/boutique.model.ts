@@ -76,11 +76,14 @@ export interface CreateBoutiquePayload {
   email?: string;
   adresse?: string;
   ville?: string;
-  adminNom: string;
-  adminPrenom: string;
+  // Soit un gestionnaire existant (il gérera alors plusieurs boutiques)…
+  adminUserId?: string;
+  // …soit le compte d'un nouveau gestionnaire.
+  adminNom?: string;
+  adminPrenom?: string;
   adminTelephone?: string;
-  adminUsername: string;
-  adminPassword: string;
+  adminUsername?: string;
+  adminPassword?: string;
 }
 
 export type UpdateBoutiquePayload = Partial<

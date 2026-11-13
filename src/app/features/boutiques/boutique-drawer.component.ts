@@ -1,6 +1,7 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Boutique } from '../../core/models/boutique.model';
+import { Gestionnaire } from '../../core/models/user.model';
 import { BoutiquesService } from '../../core/services/boutiques.service';
 import { cleanPayload } from '../../core/services/clean-payload.util';
 import { errorText } from '../../core/services/http-error.util';
@@ -25,11 +26,18 @@ import { PasswordFieldComponent } from '../../shared/components/password-field/p
       (closed)="close()"
     >
       @if (created(); as c) {
-        <app-credentials-card
-          [title]="'« ' + c.boutique + ' » est prête'"
-          [username]="c.username"
-          [password]="c.password"
-        />
+        @if (c.password) {
+          <app-credentials-card
+            [title]="'« ' + c.boutique + ' » est prête'"
+            [username]="c.username"
+            [password]="c.password"
+          />
+        } @else {
+          <div class="form-hint" style="font-size: 0.95rem">
+            « {{ c.boutique }} » est créée et rattachée à <strong>{{ c.username }}</strong>. Il la retrouve dans le
+            sélecteur de boutiques de son application, avec ses identifiants habituels.
+          </div>
+        }
       } @else {
         <form id="boutique-form" [formGroup]="form" (ngSubmit)="submit()">
           <div class="form-section" style="margin-top: 0">Boutique</div>
@@ -64,7 +72,29 @@ import { PasswordFieldComponent } from '../../shared/components/password-field/p
           </div>
 
           @if (!boutique()) {
-            <div class="form-section">Compte du gestionnaire</div>
+            <div class="form-section">Gestionnaire</div>
+            <div class="segmented" role="tablist">
+              <button type="button" [class.on]="mode() === 'new'" (click)="setMode('new')">Nouveau gestionnaire</button>
+              <button type="button" [class.on]="mode() === 'existing'" (click)="setMode('existing')" [disabled]="!gestionnaires().length">
+                Gestionnaire existant
+              </button>
+            </div>
+            @if (mode() === 'existing') {
+              <p class="form-hint">
+                Il gérera cette boutique en plus des siennes et passera de l'une à l'autre dans son application.
+              </p>
+              <div class="form-field">
+                <label for="g-exist">Gestionnaire *</label>
+                <select id="g-exist" formControlName="adminUserId">
+                  <option value="" disabled>Choisir un gestionnaire…</option>
+                  @for (g of gestionnaires(); track g.id) {
+                    <option [value]="g.id">
+                      {{ g.prenom }} {{ g.nom }} (@{{ g.username }}){{ g.boutiques?.length ? ' — ' + g.boutiques!.length + ' boutique(s)' : '' }}
+                    </option>
+                  }
+                </select>
+              </div>
+            } @else {
             <p class="form-hint">
               Il se connecte à l'application mobile et y crée les comptes de ses employés.
             </p>
@@ -91,6 +121,7 @@ import { PasswordFieldComponent } from '../../shared/components/password-field/p
               inputId="g-pass"
               label="Mot de passe * (8 caractères minimum)"
             />
+            }
           }
 
           @if (errorMessage()) {
@@ -119,12 +150,15 @@ export class BoutiqueDrawerComponent {
   readonly open = input.required<boolean>();
   /** `null` : création ; sinon modification de cette boutique. */
   readonly boutique = input<Boutique | null>(null);
+  /** Gestionnaires existants, pour rattacher la boutique à l'un d'eux. */
+  readonly gestionnaires = input<Gestionnaire[]>([]);
   readonly closed = output<void>();
   readonly saved = output<void>();
 
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
-  readonly created = signal<{ boutique: string; username: string; password: string } | null>(null);
+  readonly created = signal<{ boutique: string; username: string; password: string | null } | null>(null);
+  readonly mode = signal<'new' | 'existing'>('new');
 
   readonly form = this.fb.nonNullable.group({
     nom: ['', Validators.required],
@@ -138,7 +172,25 @@ export class BoutiqueDrawerComponent {
     adminTelephone: [''],
     adminUsername: [''],
     adminPassword: [''],
+    adminUserId: [''],
   });
+
+  setMode(mode: 'new' | 'existing'): void {
+    this.mode.set(mode);
+    this.applyAdminValidators();
+  }
+
+  /** Les champs du nouveau gestionnaire, ou le choix d'un existant, sont requis selon le mode. */
+  private applyAdminValidators(): void {
+    const creating = !this.boutique();
+    const isNew = creating && this.mode() === 'new';
+    for (const name of ['adminNom', 'adminPrenom', 'adminUsername'] as const) {
+      this.form.controls[name].setValidators(isNew ? Validators.required : null);
+    }
+    this.form.controls.adminPassword.setValidators(isNew ? [Validators.required, Validators.minLength(8)] : null);
+    this.form.controls.adminUserId.setValidators(creating && this.mode() === 'existing' ? Validators.required : null);
+    Object.values(this.form.controls).forEach((c) => c.updateValueAndValidity({ emitEvent: false }));
+  }
 
   constructor() {
     // À chaque ouverture : formulaire propre, pré-rempli en modification.
@@ -156,14 +208,8 @@ export class BoutiqueDrawerComponent {
         adresse: boutique?.adresse ?? '',
         ville: boutique?.ville ?? '',
       });
-      const adminRequired = !boutique;
-      for (const name of ['adminNom', 'adminPrenom', 'adminUsername'] as const) {
-        this.form.controls[name].setValidators(adminRequired ? Validators.required : null);
-      }
-      this.form.controls.adminPassword.setValidators(
-        adminRequired ? [Validators.required, Validators.minLength(8)] : null,
-      );
-      Object.values(this.form.controls).forEach((c) => c.updateValueAndValidity({ emitEvent: false }));
+      this.mode.set('new');
+      this.applyAdminValidators();
     });
   }
 
@@ -202,24 +248,31 @@ export class BoutiqueDrawerComponent {
       return;
     }
 
+    const existing = this.mode() === 'existing';
+    const { adminUserId, adminNom, adminPrenom, adminUsername, adminPassword, adminTelephone, ...shop } = value;
     this.boutiquesService
       .create({
-        ...cleanPayload(value),
+        ...cleanPayload(shop),
         nom: value.nom,
-        adminNom: value.adminNom,
-        adminPrenom: value.adminPrenom,
-        adminUsername: value.adminUsername,
-        adminPassword: value.adminPassword,
-        adminTelephone: value.adminTelephone || undefined,
+        ...(existing
+          ? { adminUserId }
+          : {
+              adminNom,
+              adminPrenom,
+              adminUsername,
+              adminPassword,
+              adminTelephone: adminTelephone || undefined,
+            }),
       })
       .subscribe({
         next: (boutique) => {
           this.loading.set(false);
-          this.created.set({
-            boutique: boutique.nom,
-            username: value.adminUsername,
-            password: value.adminPassword,
-          });
+          const manager = this.gestionnaires().find((g) => g.id === adminUserId);
+          this.created.set(
+            existing
+              ? { boutique: boutique.nom, username: manager ? `${manager.prenom} ${manager.nom}` : '', password: null }
+              : { boutique: boutique.nom, username: adminUsername, password: adminPassword },
+          );
           this.saved.emit();
         },
         error: (err) => this.fail(err),

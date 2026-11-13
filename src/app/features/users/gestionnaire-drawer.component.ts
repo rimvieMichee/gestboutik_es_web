@@ -1,5 +1,6 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { of, switchMap } from 'rxjs';
 import { Gestionnaire } from '../../core/models/user.model';
 import { cleanPayload } from '../../core/services/clean-payload.util';
 import { errorText } from '../../core/services/http-error.util';
@@ -23,22 +24,30 @@ export interface BoutiqueOption {
     <app-drawer
       [open]="open()"
       [title]="created() ? 'Gestionnaire créé' : gestionnaire() ? 'Modifier le gestionnaire' : 'Nouveau gestionnaire'"
-      [subtitle]="created() ? '' : gestionnaire() ? '@' + gestionnaire()!.username : 'Rattaché à une boutique existante'"
+      [subtitle]="created() ? '' : gestionnaire() ? '@' + gestionnaire()!.username : 'Il peut gérer une ou plusieurs boutiques'"
       (closed)="close()"
     >
       @if (created(); as c) {
         <app-credentials-card [title]="c.nom + ' est prêt à se connecter'" [username]="c.username" [password]="c.password" />
       } @else {
         <form id="gestionnaire-form" [formGroup]="form" (ngSubmit)="submit()">
-          @if (!gestionnaire()) {
+          @if (boutiques().length > 1 || !gestionnaire()) {
             <div class="form-field">
-              <label for="gs-boutique">Boutique *</label>
-              <select id="gs-boutique" formControlName="boutiqueId">
-                <option value="" disabled>Choisir une boutique…</option>
+              <label>Boutiques gérées *</label>
+              <div class="check-list">
                 @for (b of boutiques(); track b.id) {
-                  <option [value]="b.id">{{ b.nom }}{{ b.ville ? ' — ' + b.ville : '' }}</option>
+                  <label class="check-row">
+                    <input type="checkbox" [checked]="isSelected(b.id)" (change)="toggleBoutique(b.id)" />
+                    <span>{{ b.nom }}{{ b.ville ? ' — ' + b.ville : '' }}</span>
+                  </label>
                 }
-              </select>
+              </div>
+              <span class="form-hint">
+                Avec plusieurs boutiques, le gestionnaire passe de l'une à l'autre dans l'application.
+              </span>
+              @if (!selected().length) {
+                <span class="field-error">Choisissez au moins une boutique.</span>
+              }
             </div>
           }
           <div class="form-row">
@@ -87,7 +96,7 @@ export interface BoutiqueOption {
           <button type="button" class="btn" (click)="close()">Terminer</button>
         } @else {
           <button type="button" class="btn btn-secondary" (click)="close()">Annuler</button>
-          <button class="btn" type="submit" form="gestionnaire-form" [disabled]="form.invalid || loading()">
+          <button class="btn" type="submit" form="gestionnaire-form" [disabled]="form.invalid || loading() || !selected().length">
             {{ loading() ? 'Enregistrement...' : gestionnaire() ? 'Enregistrer' : 'Créer le gestionnaire' }}
           </button>
         }
@@ -111,8 +120,18 @@ export class GestionnaireDrawerComponent {
   readonly errorMessage = signal<string | null>(null);
   readonly created = signal<{ nom: string; username: string; password: string } | null>(null);
 
+  /** Boutiques cochées (la première est celle qui s'ouvre par défaut). */
+  readonly selected = signal<string[]>([]);
+
+  isSelected(id: string): boolean {
+    return this.selected().includes(id);
+  }
+
+  toggleBoutique(id: string): void {
+    this.selected.update((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
+  }
+
   readonly form = this.fb.nonNullable.group({
-    boutiqueId: [''],
     prenom: ['', Validators.required],
     nom: ['', Validators.required],
     telephone: [''],
@@ -128,15 +147,17 @@ export class GestionnaireDrawerComponent {
       this.created.set(null);
       this.errorMessage.set(null);
       this.loading.set(false);
+      const preset = this.presetBoutiqueId();
+      this.selected.set(
+        g ? (g.boutiques?.length ? g.boutiques.map((b) => b.id) : g.boutiqueId ? [g.boutiqueId] : []) : preset ? [preset] : [],
+      );
       this.form.reset({
-        boutiqueId: this.presetBoutiqueId() ?? '',
         prenom: g?.prenom ?? '',
         nom: g?.nom ?? '',
         telephone: g?.telephone ?? '',
         email: g?.email ?? '',
       });
       const creating = !g;
-      this.form.controls.boutiqueId.setValidators(creating ? Validators.required : null);
       this.form.controls.username.setValidators(creating ? Validators.required : null);
       this.form.controls.password.setValidators(creating ? [Validators.required, Validators.minLength(8)] : null);
       Object.values(this.form.controls).forEach((c) => c.updateValueAndValidity({ emitEvent: false }));
@@ -153,14 +174,18 @@ export class GestionnaireDrawerComponent {
     this.errorMessage.set(null);
     const v = this.form.getRawValue();
     const current = this.gestionnaire();
+    const ids = this.selected();
 
     if (current) {
+      const before = (current.boutiques ?? []).map((b) => b.id).sort().join(',');
+      const shopsChanged = this.boutiques().length > 1 && ids.slice().sort().join(',') !== before;
       this.usersService
         .update(current.id, {
           prenom: v.prenom,
           nom: v.nom,
           ...cleanPayload({ telephone: v.telephone, email: v.email }),
         })
+        .pipe(switchMap(() => (shopsChanged ? this.usersService.setBoutiques(current.id, ids) : of(null))))
         .subscribe({
           next: () => {
             this.loading.set(false);
@@ -174,7 +199,8 @@ export class GestionnaireDrawerComponent {
 
     this.usersService
       .create({
-        boutiqueId: v.boutiqueId,
+        boutiqueId: ids[0],
+        boutiqueIds: ids,
         prenom: v.prenom,
         nom: v.nom,
         username: v.username,

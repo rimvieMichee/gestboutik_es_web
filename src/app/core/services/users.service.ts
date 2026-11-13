@@ -38,6 +38,11 @@ export class UsersService {
     return this.http.patch<AppUser>(`${this.baseUrl}/${id}/status`, { statut });
   }
 
+  /** Boutiques qu'un gestionnaire peut ouvrir (au moins une). */
+  setBoutiques(id: string, boutiqueIds: string[]): Observable<AppUser> {
+    return this.http.put<AppUser>(`${this.baseUrl}/${id}/boutiques`, { boutiqueIds });
+  }
+
   resetPassword(id: string, password: string): Observable<{ success: boolean }> {
     return this.http.patch<{ success: boolean }>(`${this.baseUrl}/${id}/password`, { password });
   }

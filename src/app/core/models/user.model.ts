@@ -12,6 +12,8 @@ export interface AppUser {
   statut: UserStatus;
   boutiqueId?: string | null;
   boutique?: { id: string; nom: string; statut: string } | null;
+  /** Boutiques gérées (gestionnaires) : un gestionnaire peut en avoir plusieurs. */
+  boutiques?: Array<{ id: string; nom: string; ville?: string | null; statut: string }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,8 +29,10 @@ export interface CreateUserPayload {
   email?: string;
   username: string;
   password: string;
-  // Utile uniquement quand un SUPER_ADMIN crée un ADMIN.
+  // Utile uniquement quand un SUPER_ADMIN crée un ADMIN : la première boutique
+  // est celle qui s'ouvre par défaut ; les autres s'y ajoutent.
   boutiqueId?: string;
+  boutiqueIds?: string[];
 }
 
 export type UpdateUserPayload = Partial<Omit<CreateUserPayload, 'password' | 'username' | 'boutiqueId'>>;
