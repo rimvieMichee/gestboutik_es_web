@@ -112,7 +112,9 @@ import { IconComponent } from '../icon/icon.component';
         display: flex;
         gap: 0.6rem;
         justify-content: flex-end;
-        padding: 0.9rem 1.5rem;
+        /* Marge basse : le badge « Powered by Netlify » (en bas à droite) ne doit pas
+           recouvrir les boutons Annuler / Créer. */
+        padding: 0.9rem 1.5rem 4.5rem;
         border-top: 1px solid var(--color-border);
         background: var(--color-surface);
       }
