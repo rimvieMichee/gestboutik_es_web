@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Boutique } from '../../core/models/boutique.model';
 import { Gestionnaire } from '../../core/models/user.model';
@@ -197,20 +197,26 @@ export class BoutiqueDrawerComponent {
     effect(() => {
       if (!this.open()) return;
       const boutique = this.boutique();
-      this.created.set(null);
-      this.errorMessage.set(null);
-      this.loading.set(false);
-      this.form.reset({
-        nom: boutique?.nom ?? '',
-        description: boutique?.description ?? '',
-        telephone: boutique?.telephone ?? '',
-        email: boutique?.email ?? '',
-        adresse: boutique?.adresse ?? '',
-        ville: boutique?.ville ?? '',
-      });
-      this.mode.set('new');
-      this.applyAdminValidators();
+      // Le reste ne doit pas être suivi : lire `mode()` ici relancerait l'effet
+      // à chaque clic sur « Gestionnaire existant » et remettrait « Nouveau ».
+      untracked(() => this.resetForm(boutique));
     });
+  }
+
+  private resetForm(boutique: Boutique | null): void {
+    this.created.set(null);
+    this.errorMessage.set(null);
+    this.loading.set(false);
+    this.form.reset({
+      nom: boutique?.nom ?? '',
+      description: boutique?.description ?? '',
+      telephone: boutique?.telephone ?? '',
+      email: boutique?.email ?? '',
+      adresse: boutique?.adresse ?? '',
+      ville: boutique?.ville ?? '',
+    });
+    this.mode.set('new');
+    this.applyAdminValidators();
   }
 
   close(): void {

@@ -132,7 +132,7 @@ const SEVEN_DAYS = 7 * 24 * 3600 * 1000;
       [boutique]="editing()"
       [gestionnaires]="gestionnaires()"
       (closed)="drawerOpen.set(false)"
-      (saved)="load()"
+      (saved)="load(); loadGestionnaires()"
     />
   `,
 })
@@ -155,8 +155,12 @@ export class BoutiquesListComponent implements OnInit {
   readonly gestionnaires = signal<Gestionnaire[]>([]);
   private page = 1;
 
-  ngOnInit(): void {
+  loadGestionnaires(): void {
     this.usersService.findAll({ limit: 100 }).subscribe((res) => this.gestionnaires.set(res.data));
+  }
+
+  ngOnInit(): void {
+    this.loadGestionnaires();
     this.load();
     // Ventes, crédits, produits et comptes : les indicateurs de chaque boutique bougent en direct.
     onRealtime(
