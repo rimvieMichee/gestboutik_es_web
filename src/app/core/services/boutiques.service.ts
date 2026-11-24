@@ -18,6 +18,15 @@ export interface BoutiqueQuery extends PaginationQuery {
   statut?: BoutiqueStatus;
 }
 
+export interface DeleteBoutiqueResult {
+  id: string;
+  deleted: boolean;
+  ventes: number;
+  produits: number;
+  employes: number;
+  gestionnairesSupprimes: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class BoutiquesService {
   private readonly baseUrl = `${environment.apiUrl}/boutiques`;
@@ -42,6 +51,11 @@ export class BoutiquesService {
 
   update(id: string, payload: UpdateBoutiquePayload): Observable<Boutique> {
     return this.http.patch<Boutique>(`${this.baseUrl}/${id}`, payload);
+  }
+
+  /** Suppression définitive : le nom exact de la boutique est exigé par le serveur. */
+  remove(id: string, confirmNom: string): Observable<DeleteBoutiqueResult> {
+    return this.http.delete<DeleteBoutiqueResult>(`${this.baseUrl}/${id}`, { params: { confirmNom } });
   }
 
   changeStatus(id: string, statut: BoutiqueStatus): Observable<Boutique> {

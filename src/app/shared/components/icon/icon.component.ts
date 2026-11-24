@@ -70,6 +70,9 @@ import { Component, Input } from '@angular/core';
           <path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17l-1 3Z" />
           <path d="M14.5 7.5l3 3" />
         }
+        @case ('trash') {
+          <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 1.8h6a2 2 0 0 0 2-1.8L18 7M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7" />
+        }
         @case ('power') {
           <path d="M12 3v8" />
           <path d="M6.3 7.2a8 8 0 1 0 11.4 0" />

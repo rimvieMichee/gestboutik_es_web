@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BoutiqueOverview, BoutiqueUser } from '../../core/models/boutique.model';
 import { Gestionnaire } from '../../core/models/user.model';
 import { BoutiquesService } from '../../core/services/boutiques.service';
@@ -61,6 +61,9 @@ import { BoutiqueDrawerComponent } from './boutique-drawer.component';
           <button class="btn btn-secondary" (click)="openGestionnaire(null)"><app-icon name="plus" [size]="16" /> Gestionnaire</button>
           <button class="btn" [class.btn-danger]="b.statut === 'ACTIVE'" (click)="toggleBoutique()">
             <app-icon name="power" [size]="16" /> {{ b.statut === 'ACTIVE' ? 'Désactiver' : 'Activer' }}
+          </button>
+          <button class="btn btn-secondary" style="color: var(--color-danger)" (click)="removeBoutique()">
+            <app-icon name="trash" [size]="16" /> Supprimer
           </button>
         </div>
       </div>
@@ -252,6 +255,7 @@ import { BoutiqueDrawerComponent } from './boutique-drawer.component';
 })
 export class BoutiqueDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly boutiquesService = inject(BoutiquesService);
   private readonly usersService = inject(UsersService);
   private readonly confirm = inject(ConfirmService);
@@ -336,6 +340,27 @@ export class BoutiqueDetailComponent implements OnInit {
     });
     if (!ok) return;
     this.boutiquesService.changeStatus(b.id, deactivate ? 'INACTIVE' : 'ACTIVE').subscribe(() => this.load());
+  }
+
+  async removeBoutique(): Promise<void> {
+    const d = this.data();
+    const b = d?.boutique;
+    if (!d || !b) return;
+    const ok = await this.confirm.ask({
+      title: 'Supprimer définitivement cette boutique ?',
+      message:
+        `« ${b.nom} » sera effacée avec ses ${d.produits.actifs + d.produits.archives} produit(s), toutes ses ventes et ses ${d.employes.length} employé(s). ` +
+        `Les gestionnaires qui ne gèrent que cette boutique seront supprimés aussi ; ceux qui en gèrent d'autres gardent leur compte. ` +
+        `Cette action est irréversible. Pour la simple mise en pause, utilisez « Désactiver ».`,
+      confirmLabel: 'Supprimer définitivement',
+      danger: true,
+      requireText: b.nom,
+    });
+    if (!ok) return;
+    this.boutiquesService.remove(b.id, b.nom).subscribe({
+      next: () => this.router.navigate(['/boutiques']),
+      error: (err) => this.error.set(errorText(err)),
+    });
   }
 
   async toggleUser(g: BoutiqueUser): Promise<void> {

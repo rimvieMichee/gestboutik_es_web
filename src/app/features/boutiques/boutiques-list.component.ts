@@ -113,6 +113,7 @@ const SEVEN_DAYS = 7 * 24 * 3600 * 1000;
               <td class="actions-cell">
                 <a class="icon-btn" [routerLink]="['/boutiques', b.id]" title="Voir le suivi" aria-label="Voir le suivi"><app-icon name="chevron-right" [size]="16" /></a>
                 <button class="icon-btn" (click)="openEdit(b)" title="Modifier" aria-label="Modifier"><app-icon name="pencil" [size]="16" /></button>
+                <button class="icon-btn danger" (click)="removeBoutique(b)" title="Supprimer" aria-label="Supprimer"><app-icon name="trash" [size]="16" /></button>
                 <button class="icon-btn" [class.danger]="b.statut === 'ACTIVE'" (click)="toggleStatus(b)" [title]="b.statut === 'ACTIVE' ? 'Désactiver' : 'Activer'" [attr.aria-label]="b.statut === 'ACTIVE' ? 'Désactiver' : 'Activer'">
                   <app-icon name="power" [size]="16" />
                 </button>
@@ -214,6 +215,28 @@ export class BoutiquesListComponent implements OnInit {
     if (b.statut !== 'ACTIVE') return false;
     const last = b.stats.derniereVente;
     return !last || Date.now() - new Date(last).getTime() > SEVEN_DAYS;
+  }
+
+  async removeBoutique(boutique: BoutiqueWithStats): Promise<void> {
+    const s = boutique.stats;
+    const ok = await this.confirm.ask({
+      title: 'Supprimer définitivement cette boutique ?',
+      message:
+        `« ${boutique.nom} » sera effacée avec ses ${s.produits} produit(s), ses ventes et ses ${s.employes} employé(s). ` +
+        `Les gestionnaires qui ne gèrent que cette boutique seront supprimés aussi ; ceux qui en gèrent d'autres gardent leur compte. ` +
+        `Cette action est irréversible. Pour la simple mise en pause, utilisez « Désactiver ».`,
+      confirmLabel: 'Supprimer définitivement',
+      danger: true,
+      requireText: boutique.nom,
+    });
+    if (!ok) return;
+    this.boutiquesService.remove(boutique.id, boutique.nom).subscribe({
+      next: () => {
+        this.load();
+        this.loadGestionnaires();
+      },
+      error: (err) => this.errorMessage.set(errorText(err)),
+    });
   }
 
   async toggleStatus(boutique: Boutique): Promise<void> {

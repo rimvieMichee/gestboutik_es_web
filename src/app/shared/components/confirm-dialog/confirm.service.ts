@@ -5,6 +5,8 @@ export interface ConfirmOptions {
   message: string;
   confirmLabel?: string;
   danger?: boolean;
+  /** Texte à retaper pour activer le bouton (actions irréversibles). */
+  requireText?: string;
 }
 
 interface PendingConfirm extends ConfirmOptions {

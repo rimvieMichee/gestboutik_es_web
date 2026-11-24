@@ -1,4 +1,4 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, HostListener, effect, inject, signal } from '@angular/core';
 import { ConfirmService } from './confirm.service';
 
 @Component({
@@ -10,9 +10,21 @@ import { ConfirmService } from './confirm.service';
       <div class="dialog" role="alertdialog" aria-modal="true" [attr.aria-label]="request.title">
         <h3>{{ request.title }}</h3>
         <p>{{ request.message }}</p>
+        @if (request.requireText; as expected) {
+          <div class="form-field" style="margin-bottom: 1.1rem">
+            <label for="confirm-text">Pour confirmer, saisissez <strong>{{ expected }}</strong></label>
+            <input id="confirm-text" type="text" autocomplete="off" [value]="typed()" (input)="typed.set($any($event.target).value)" />
+          </div>
+        }
         <div class="actions">
           <button type="button" class="btn btn-secondary" (click)="confirm.answer(false)">Annuler</button>
-          <button type="button" class="btn" [class.btn-danger]="request.danger" (click)="confirm.answer(true)">
+          <button
+            type="button"
+            class="btn"
+            [class.btn-danger]="request.danger"
+            [disabled]="!!request.requireText && typed().trim() !== request.requireText.trim()"
+            (click)="confirm.answer(true)"
+          >
             {{ request.confirmLabel || 'Confirmer' }}
           </button>
         </div>
@@ -42,6 +54,15 @@ import { ConfirmService } from './confirm.service';
 })
 export class ConfirmDialogComponent {
   readonly confirm = inject(ConfirmService);
+  readonly typed = signal('');
+
+  constructor() {
+    // Champ de confirmation vide à chaque nouvelle demande.
+    effect(() => {
+      this.confirm.pending();
+      this.typed.set('');
+    });
+  }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
